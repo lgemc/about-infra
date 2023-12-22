@@ -1,0 +1,3 @@
+module "repositories" {
+  source = "./repositories"
+}

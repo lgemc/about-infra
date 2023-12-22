@@ -1,0 +1,3 @@
+module "buckets" {
+  source = "./buckets"
+}
