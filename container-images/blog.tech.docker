@@ -1,0 +1,3 @@
+FROM nginx:alpine
+ARG DIST_FOLDER
+COPY ${DIST_FOLDER} /usr/share/nginx/html 

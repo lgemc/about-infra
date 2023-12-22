@@ -1,0 +1,10 @@
+FROM node:18-alpine3.18
+ARG SCRIPT_PATH
+# Set the working directory inside the container
+WORKDIR /app
+
+# Copy the Go executable into the container
+COPY ${SCRIPT_PATH} /app/index.js
+EXPOSE ${PORT}
+# Command to run the Go executable
+CMD ["node", "index.js"]

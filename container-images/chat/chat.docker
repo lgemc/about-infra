@@ -1,0 +1,4 @@
+FROM nginx:alpine
+COPY compute/containerized/images/chat/nginx.conf /etc/nginx/nginx.conf
+ARG DIST_FOLDER
+COPY ${DIST_FOLDER} /usr/share/nginx/html/ 

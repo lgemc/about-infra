@@ -1,0 +1,11 @@
+FROM alpine:latest
+ARG EXECUTABLE_PATH
+ARG PORT
+# Set the working directory inside the container
+WORKDIR /app
+
+# Copy the Go executable into the container
+COPY ${EXECUTABLE_PATH} /app/
+EXPOSE ${PORT}
+# Command to run the Go executable
+CMD ["./main"]
