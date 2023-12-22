@@ -1,0 +1,159 @@
+BLOG_IMAGE_TAG=blog/tech
+MOVIES_IMAGE_TAG=atelier/movies
+DIST_BASE_FOLDER=dist
+GO_MONOREPO_BASE_FOLDER=compute/go-monorepo
+
+BLOG_IMAGE_ECR_RESOURCE=081952199324.dkr.ecr.us-east-1.amazonaws.com/blog/tech
+MOVIES_IMAGE_ECR_RESOURCE=081952199324.dkr.ecr.us-east-1.amazonaws.com/atelier/movies
+KAFKA_CONSUMER_IMAGE_ECR_RESOURCE=081952199324.dkr.ecr.us-east-1.amazonaws.com/rappi-demo/kafka-consumer
+KAFKA_WEB_PRODUCER_IMAGE_ECR_RESOURCE=081952199324.dkr.ecr.us-east-1.amazonaws.com/rappi-demo/kafka-web-producer
+DB_SETUP_IMAGE_ECR_RESOURCE=081952199324.dkr.ecr.us-east-1.amazonaws.com/rappi-demo/db-setup
+BLOG_TECH_STATIC_FOLDER:=$(shell pwd)/blog/tech/static
+PWD:=$(shell pwd)
+
+docker.login:
+	aws ecr get-login-password --region us-east-1 --profile i |docker login  --username AWS --password-stdin 081952199324.dkr.ecr.us-east-1.amazonaws.com
+
+
+ecr.docker.login:
+	aws ecr get-login-password --region us-east-1 --profile i |docker login  --username AWS --password-stdin 081952199324.dkr.ecr.us-east-1.amazonaws.com
+
+blog.tech.image.tag:
+	docker tag $(BLOG_IMAGE_TAG):latest $(BLOG_IMAGE_ECR_RESOURCE):latest 
+
+blog.tech.image.build:
+	docker buildx build --platform linux/amd64 -f ./compute/containerized/images/blog.tech.docker ./ -t $(BLOG_IMAGE_TAG) --build-arg DIST_FOLDER=dist/blog/tech	
+
+movies.build:
+	npm run build-atelier --prefix Try/angular/al-angular-course-project
+
+movies.image.build: movies.build
+	docker buildx build --platform linux/amd64 -f ./compute/containerized/images/movies/movies.docker ./ -t $(MOVIES_IMAGE_TAG) --build-arg DIST_FOLDER=Try/angular/al-angular-course-project/dist
+
+movies.image.tag:
+	docker tag $(MOVIES_IMAGE_TAG):latest $(MOVIES_IMAGE_ECR_RESOURCE):latest
+
+movies.image.push:
+	docker push $(MOVIES_IMAGE_ECR_RESOURCE):latest
+
+rappi-demo.kafka-consumer.build:
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o dist/kafka-to-console/main -C $(GO_MONOREPO_BASE_FOLDER) cmd/kafka-to-console/main.go
+
+rappi-demo.kafka-consumer.pick-build: rappi-demo.kafka-consumer.build
+	mkdir -p dist/rappi-demo/kafka-consumer
+	cp $(GO_MONOREPO_BASE_FOLDER)/dist/kafka-to-console/main ./dist/rappi-demo/kafka-consumer/main
+
+rappi-demo.kafka-consumer.image.build: rappi-demo.kafka-consumer.pick-build
+	docker buildx build --platform linux/amd64 -f ./compute/containerized/images/base-golang.docker ./ -t rappi-demo/kafka-consumer --build-arg EXECUTABLE_PATH=dist/rappi-demo/kafka-consumer
+
+rappi-demo.kafka-consumer.image.tag: rappi-demo.kafka-consumer.image.build
+	docker tag rappi-demo/kafka-consumer:latest $(KAFKA_CONSUMER_IMAGE_ECR_RESOURCE):latest
+
+rappi-demo.db-setup.build:
+	npm run npx esbuild-runner ops/build-db-setup.ts --prefix compute/node-monorepo/ 
+
+rappi-demo.db-setup.pick-build: rappi-demo.db-setup.build
+	mkdir -p dist/rappi-demo/db-setup
+	cp compute/node-monorepo/dist/db-setup/index.js ./dist/rappi-demo/db-setup/index.js
+
+rappi-demo.db-setup.image.build: rappi-demo.db-setup.pick-build
+	docker buildx build --platform linux/amd64 -f ./compute/containerized/images/node-18.docker ./ -t rappi-demo/db-setup --build-arg SCRIPT_PATH=dist/rappi-demo/db-setup/index.js
+
+rappi-demo.db-setup.image.tag: rappi-demo.db-setup.image.build
+	docker tag rappi-demo/db-setup:latest $(DB_SETUP_IMAGE_ECR_RESOURCE):latest
+
+rappi-demo.db-setup.image.push: rappi-demo.db-setup.image.tag
+	docker push $(DB_SETUP_IMAGE_ECR_RESOURCE):latest
+
+rappi-demo.kafka-consumer.image.push: rappi-demo.kafka-consumer.image.tag
+	docker push $(KAFKA_CONSUMER_IMAGE_ECR_RESOURCE):latest
+
+rappi-demo.kafka-web-producer.build:
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o dist/kafka-web-producer/main -C $(GO_MONOREPO_BASE_FOLDER) cmd/http-to-kafka/main.go
+
+rappi-demo.kafka-web-producer.pick-build: rappi-demo.kafka-web-producer.build
+	mkdir -p dist/rappi-demo/kafka-web-producer
+	cp $(GO_MONOREPO_BASE_FOLDER)/dist/kafka-web-producer/main ./dist/rappi-demo/kafka-web-producer/main
+
+rappi-demo.kafka-web-producer.image.build: rappi-demo.kafka-web-producer.pick-build
+	docker buildx build --platform linux/amd64 -f ./compute/containerized/images/base-golang.docker ./ -t rappi-demo/kafka-web-producer --build-arg EXECUTABLE_PATH=dist/rappi-demo/kafka-web-producer
+
+rappi-demo.kafka-web-producer.image.tag: rappi-demo.kafka-web-producer.image.build
+	docker tag rappi-demo/kafka-web-producer:latest $(KAFKA_WEB_PRODUCER_IMAGE_ECR_RESOURCE):latest
+
+rappi-demo.kafka-web-producer.image.push: rappi-demo.kafka-web-producer.image.tag
+	docker push $(KAFKA_WEB_PRODUCER_IMAGE_ECR_RESOURCE):latest
+
+rappi-demo.sockets.build:
+	npm run npx esbuild-runner ops/build-sockets.ts --prefix compute/node-monorepo/
+
+rappi-demo.sockets.pick-build: rappi-demo.sockets.build
+	mkdir -p dist/rappi-demo/sockets
+	cp compute/node-monorepo/dist/sockets/index.js ./dist/rappi-demo/sockets/index.js
+
+rappi-demo.sockets.image.build: rappi-demo.sockets.pick-build
+	docker buildx build --platform linux/amd64 -f ./compute/containerized/images/node-18.docker ./ -t rappi-demo/sockets --build-arg SCRIPT_PATH=dist/rappi-demo/sockets/index.js
+
+rappi-demo.sockets.image.tag: rappi-demo.sockets.image.build
+	docker tag rappi-demo/sockets:latest 081952199324.dkr.ecr.us-east-1.amazonaws.com/rappi-demo/sockets:latest
+
+rappi-demo.sockets.image.push: rappi-demo.sockets.image.tag
+	docker push 081952199324.dkr.ecr.us-east-1.amazonaws.com/rappi-demo/sockets:latest
+
+rappi-demo.chat-api.build:
+	npm run npx esbuild-runner ops/build-api.ts --prefix compute/node-monorepo/
+
+rappi-demo.chat-api.pick-build: rappi-demo.chat-api.build
+	mkdir -p dist/rappi-demo/chat-api
+	cp compute/node-monorepo/dist/api/index.js ./dist/rappi-demo/chat-api/index.js
+
+rappi-demo.chat-api.image.build: rappi-demo.chat-api.pick-build
+	docker buildx build --platform linux/amd64 -f ./compute/containerized/images/node-18.docker ./ -t rappi-demo/chat-api --build-arg SCRIPT_PATH=dist/rappi-demo/chat-api/index.js
+
+rappi-demo.chat-api.image.tag: rappi-demo.chat-api.image.build
+	docker tag rappi-demo/chat-api:latest 081952199324.dkr.ecr.us-east-1.amazonaws.com/rappi-demo/chat-api:latest
+
+rappi-demo.chat-api.image.push: rappi-demo.chat-api.image.tag
+	docker push 081952199324.dkr.ecr.us-east-1.amazonaws.com/rappi-demo/chat-api:latest
+
+rappi-demo.chat-app.build:
+	npm run npx vite build --prefix ./compute/react-monorepo
+
+rappi-demo.chat-app.pick-build: rappi-demo.chat-app.build
+	mkdir -p dist/rappi-demo/chat-app
+	cp -r compute/react-monorepo/dist/* ./dist/rappi-demo/chat-app
+
+rappi-demo.chat-app.image.build: rappi-demo.chat-app.pick-build
+	docker buildx build --platform linux/amd64 -f ./compute/containerized/images/chat/chat.docker ./ -t rappi-demo/chat-app --build-arg DIST_FOLDER=dist/rappi-demo/chat-app
+
+rappi-demo.chat-app.image.tag: rappi-demo.chat-app.image.build
+	docker tag rappi-demo/chat-app:latest 081952199324.dkr.ecr.us-east-1.amazonaws.com/rappi-demo/chat-app:latest
+
+rappi-demo.chat-app.image.push: rappi-demo.chat-app.image.tag
+	docker push 081952199324.dkr.ecr.us-east-1.amazonaws.com/rappi-demo/chat-app:latest
+
+movies.image.publish: movies.image.build movies.image.tag movies.image.push
+
+blog.tech.content.build: blog.tech.diagrams.build
+	hugo --source blog/tech --destination $(PWD)/dist/blog/tech/
+
+blog.tech.serve:
+	hugo server --source=blog/tech
+
+
+blog.tech.image.publish: blog.tech.content.build blog.tech.image.build blog.tech.image.tag blog.tech.image.push
+
+blog.tech.image.deploy: blog.tech.image.publish
+	kubectl rollout restart deployment blog-tech-web
+
+blog.tech.bucket.deploy: blog.tech.content.build
+	aws s3 sync $(PWD)/dist/blog/tech/ s3://lgemc-blog
+
+infra.plan:
+	terraform -chdir=compute/infra plan
+
+infra.init:
+	terraform -chdir=compute/infra init
+
+infra.apply:
+	terraform -chdir=compute/infra apply
