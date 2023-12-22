@@ -1,0 +1,23 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: rappi-demo-db-setup
+  labels:
+    app: rappi-demo-db-setup
+spec:
+  template:
+    metadata:
+      name: rappi-demo-db-setup
+      labels:
+        app: rappi-demo-db-setup
+    spec:
+      containers:
+        - name: rappi-demo-db-setup
+          image: 081952199324.dkr.ecr.us-east-1.amazonaws.com/rappi-demo/db-setup:latest
+          env:
+            - name: RETHINK_DB_HOST
+              value: real-time-db
+            - name: RETHINK_DB_PORT
+              value: "28015"
+      restartPolicy: Never
+  backoffLimit: 4

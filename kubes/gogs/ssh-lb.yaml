@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: gogs-lb
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 222
+      targetPort: 22
+      name: ssh
+  selector:
+    app: gogs-web

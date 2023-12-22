@@ -1,0 +1,95 @@
+---
+- name: etcd installation
+  hosts: master
+  become: yes
+  vars:
+    systemd_dir: /etc/systemd/system
+    env_var_file: /etc/default/etcd/env
+    version: v3.4.24
+    data_mount_point: /var/lib/etcd
+    data_folder: /var/lib/etcd/data
+    download_url: https://github.com/etcd-io/etcd/releases/download
+    volume_uuid: 4f4ecbbe-a0cd-4e71-a157-a7dccfdb4cbc
+    etcd_binary_path: /usr/bin/etcd
+  tasks:
+    - name: Creates mount point to external etcd data storage
+      file:
+        path: "{{ data_mount_point }}"
+        state: directory
+    - name: Check mount point is configured 
+      shell: 'grep -c "^{{ volume_uuid }}" /etc/fstab || true'
+      register: volume_configured
+    - name: Add volume to fstab
+      lineinfile:
+        dest: /etc/fstab
+        line: "UUID={{ volume_uuid }} {{ data_mount_point }} ext4 defaults,nofail  0  2"
+      when: volume_configured.stdout == "0"
+    - name: Check etcd binary
+      stat:
+        path: /usr/bin/etcd
+      register: etcd_bin
+    - name: Ensure temp folder
+      tempfile:
+        state: directory
+        suffix: etcd
+      register: temp_folder
+      when: not etcd_bin.stat.exists
+    - name: Download binary
+      get_url:
+        url: "{{ download_url }}/{{ version }}/etcd-{{ version }}-linux-amd64.tar.gz"
+        dest: "{{ temp_folder.path }}/etcd.tar.gz"
+        owner: root
+        group: root
+        mode: 0644
+      register: download
+      when: not etcd_bin.stat.exists
+    - name: Ensure out unzip folder
+      tempfile:
+        state: directory
+        suffix: etcd
+      register: out_folder
+      when: not etcd_bin.stat.exists
+    - name: Unzip folder
+      become: yes
+      unarchive:
+        src: "{{ download.dest }}"
+        dest: "{{ out_folder.path }}"
+        remote_src: true
+        list_files: true
+      register: unzip_folder
+      when: not etcd_bin.stat.exists
+    - name: Move binary to location
+      copy: 
+        src: "{{ out_folder.path}}/{{ unzip_folder.files[0] }}etcd"
+        dest: /usr/bin/etcd
+        group: root
+        owner: root
+        mode: 0644
+        remote_src: true
+      when: not etcd_bin.stat.exists
+    - name: Allow execute etcd
+      file: "dest={{ etcd_binary_path }} mode=a+x"
+    - name: Creates etcd var folder
+      file:
+        path: /etc/default/etcd
+        state: directory
+    - name: Copy systemctl env file
+      ansible.builtin.template:
+        src: service.j2
+        dest: "{{ systemd_dir }}/etcd.service"
+        owner: root
+        group: root
+        mode: 0644
+    - name: Copy env vars file
+      ansible.builtin.template:
+        src: env.j2
+        dest: "{{ env_var_file }}"
+        group: root
+        owner: root
+        mode: 0644
+    - name: Register service
+      systemd:
+        name: etcd
+        state: restarted
+        daemon_reload: yes
+        enabled: true

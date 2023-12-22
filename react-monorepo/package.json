@@ -1,0 +1,32 @@
+{
+  "name": "react-monorepo",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "npx": "npx"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@types/react-dom": "^18.2.18",
+    "@vitejs/plugin-react": "^4.2.1",
+    "axios": "^1.6.2",
+    "esbuild-runner": "^2.2.2",
+    "immer": "^10.0.3",
+    "neverthrow": "^6.1.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-doom": "^1.0.0",
+    "socket.io-client": "^4.7.2",
+    "typescript": "^5.3.3",
+    "vite-plugin-env-compatible": "^2.0.1",
+    "vite-tsconfig-paths": "^4.2.2",
+    "zustand": "^4.4.7"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.45",
+    "ts-node": "^10.9.2"
+  }
+}

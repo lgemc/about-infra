@@ -1,0 +1,30 @@
+{ 
+  "compilerOptions": {
+    "rootDir": "./",
+    "baseUrl": "./",
+    "skipLibCheck": true,
+    "lib": [
+      "ES2021.String"
+    ],
+    "experimentalDecorators": true,
+    "incremental": true,
+    "esModuleInterop": true,
+    "emitDecoratorMetadata": true,
+    "outDir": "dist",
+    "paths": {
+      "@atelier/*": ["./src/*"],
+      "@api/*": ["./src/api/*"],
+    },
+    "target": "ES2018",
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "preserveConstEnums": true,
+    "sourceMap": true,
+    "types": ["node"]
+  },
+  "include": ["./"],
+  "exclude": [
+    "**/node_modules/**",
+    "**/*.test.*/**"
+  ]
+}

@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rappi-demo-chat-api 
+  labels:
+    app: rappi-demo-chat-api
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rappi-demo-chat-api
+  
+  template:
+    metadata:
+      labels:
+        app: rappi-demo-chat-api
+    
+    spec:
+      containers:
+        - name: web
+          image: 081952199324.dkr.ecr.us-east-1.amazonaws.com/rappi-demo/chat-api:latest
+          ports:
+            - name: web
+              containerPort: 1337
+          env:
+            - name: RETHINK_DB_HOST
+              value: real-time-db
+            - name: RETHINK_DB_PORT
+              value: "28015"
+            - name: ATELIER_ALLOWED_HOSTS
+              value: "https://chat.atelier.run"  
+      imagePullSecrets:
+        - name: awsecr-cred

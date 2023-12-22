@@ -1,0 +1,27 @@
+export enum Vars {
+  HOST = "HOST",
+  // Allowed hosts to handle cors requests.
+  // Can be a list of hosts separed by a coma, like https://a.com,https://b.com
+  ALLOWED_HOSTS = "ATELIER_ALLOWED_HOSTS",
+  PORT = "ATELIER_PORT",
+  ATELIER_SOCKETS_PORT = "ATELIER_SOCKETS_PORT",
+  NODE_ENV = "NODE_ENV",
+  RETHINK_DB_HOST = "RETHINK_DB_HOST",
+  RETHINK_DB_PORT = "RETHINK_DB_PORT",
+  DATABASE_HOST = "DATABASE_HOST",
+  DATABASE_PORT = "DATABASE_PORT",
+  DATABASE_NAME = "ATELIER_DATABASE_NAME",
+  SHOPIFY_APP_PATH = "SHOPIFY_APP_PATH",
+  DATABASE_USERNAME = "ATELIER_DATABASE_USERNAME",
+  QUEUE_URL = "QUEUE_URL",
+  // jwt secret used on jwt authentications
+  JWT_SECRET = "ATELIER_JWT_SECRET",
+  DATABASE_PASSWORD = "ATELIER_DATABASE_PASSWORD",
+  // sqlite database file path
+  SQLITE_DATABASE = "SQLITE_DATABASE",
+  // shopify client app
+  SHOPIFY_APP_CLIENT_ID = "SHOPIFY_APP_CLIENT_ID",
+  SHOPIFY_APP_CLIENT_SECRET = "SHOPIFY_APP_CLIENT_SECRET",
+  // host were shopify customer front logic is served
+  SHOPIFY_CUSTOMER_SCRIPT_HOST = "SHOPIFY_CUSTOMER_SCRIPT_HOST",
+}

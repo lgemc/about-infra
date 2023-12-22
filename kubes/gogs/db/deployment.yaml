@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment 
+metadata:
+  name: gogs-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gogs-db
+  template:
+    metadata:
+      labels:
+        app: gogs-db
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:14.7-alpine3.17
+          imagePullPolicy: "IfNotPresent"
+          ports:
+            - containerPort: 5432
+          envFrom:
+            - configMapRef:
+                name: gogs-db-config
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: gogs-db
+      volumes:
+        - name: gogs-db
+          persistentVolumeClaim:
+            claimName: gogs-db-claim

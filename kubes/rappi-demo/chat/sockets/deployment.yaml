@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rappi-demo-sockets 
+  labels:
+    app: rappi-demo-sockets
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rappi-demo-sockets
+  template:
+    metadata:
+      labels:
+        app: rappi-demo-sockets
+    spec:
+      containers:
+        - name: web
+          image: 081952199324.dkr.ecr.us-east-1.amazonaws.com/rappi-demo/sockets:latest
+          ports:
+            - name: web
+              containerPort: 1338
+          env:
+            - name: RETHINK_DB_HOST
+              value: real-time-db
+            - name: RETHINK_DB_PORT
+              value: "28015"
+            - name: ATELIER_ALLOWED_HOSTS
+              value: "https://chat.atelier.run"
+      imagePullSecrets:
+        - name: awsecr-cred

@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rappi-demo-kafka-consumer
+  labels:
+    app: rappi-demo-kafka-consumer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rappi-demo-kafka-consumer
+  template:
+    metadata:
+      labels:
+        app: rappi-demo-kafka-consumer
+    spec:
+      containers:
+        - name: kafka-consumer
+          image: 081952199324.dkr.ecr.us-east-1.amazonaws.com/rappi-demo/kafka-consumer:latest
+          env: 
+            - name: KAFKA_URL
+              value: "kafka-service.kafka.svc.cluster.local:9092"
+      imagePullSecrets:
+        - name: awsecr-cred

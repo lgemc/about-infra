@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rappi-demo-kafka-web-producer
+  labels:
+    app: rappi-demo-kafka-web-producer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rappi-demo-kafka-web-producer
+  template:
+    metadata:
+      labels:
+        app: rappi-demo-kafka-web-producer
+    spec:
+      containers:
+        - name: web
+          image: 081952199324.dkr.ecr.us-east-1.amazonaws.com/rappi-demo/kafka-web-producer:latest
+          ports:
+            - name: web
+              containerPort: 80
+          env: 
+            - name: KAFKA_URL
+              value: "kafka-service.kafka.svc.cluster.local:9092"
+            - name: PORT
+              value: "80"  
+      imagePullSecrets:
+        - name: awsecr-cred

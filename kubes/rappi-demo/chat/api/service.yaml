@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: rappi-demo-chat-api
+  labels:
+    app: rappi-demo-chat-api
+spec:
+  type: ClusterIP
+  ports:
+    - name: web
+      port: 1337
+      targetPort: 1337
+  selector:
+    app: rappi-demo-chat-api

@@ -1,0 +1,13 @@
+[Unit]
+Description=Etcd key value store service 
+After=network-online.target
+
+[Service]
+ExecStart={{ etcd_binary_path }} {{ extra_args | default("") }}
+EnvironmentFile={{ env_var_file }}
+Restart=always
+StandardOutput=syslog
+StandardError=syslog
+
+[Install]
+WantedBy=multi-user.target

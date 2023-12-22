@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: rappi-demo-kafka-web-producer
+  labels:
+    app: rappi-demo-kafka-web-producer
+spec:
+  type: ClusterIP
+  ports:
+    - name: web
+      port: 80
+  selector:
+    app: rappi-demo-kafka-web-producer

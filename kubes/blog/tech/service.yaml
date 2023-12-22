@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: blog-tech-web
+  labels:
+    app: blog-tech-web
+spec:
+  type: ClusterIP
+  ports:
+    - name: web
+      port: 80
+  selector:
+    app: blog-tech-web

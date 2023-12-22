@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: StatefulSet 
+metadata:
+  name: rethinkdb-sts
+  labels:
+    app: rethinkdb-sts
+spec:
+  serviceName: real-time-db
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rethinkdb-sts
+  template:
+    metadata:
+        labels:
+            app: rethinkdb-sts
+    spec:
+      containers:
+        - image: rethinkdb:latest
+          name: rethinkdb-sts
+          ports:
+            - containerPort: 28015
+            - containerPort: 29015
+          volumeMounts:
+            - name: data
+              mountPath: /data
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: rethinkdb-claim
+

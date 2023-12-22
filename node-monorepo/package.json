@@ -1,0 +1,26 @@
+{
+  "name": "monorepo",
+  "version": "1.0.0",
+  "description": "Mono repo that contins all personal proyects using node",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "npx": "npx"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@koa/router": "^12.0.1",
+    "@types/node": "^20.10.5",
+    "esbuild": "^0.19.10",
+    "esbuild-runner": "^2.2.2",
+    "koa": "^2.14.2",
+    "koa-body": "^6.0.1",
+    "koa-socket-2": "^2.0.0",
+    "moment": "^2.29.4",
+    "neverthrow": "^6.1.0",
+    "parse-duration": "^1.1.0",
+    "rethinkdb-ts": "^2.6.0",
+    "typescript": "^5.3.3"
+  }
+}

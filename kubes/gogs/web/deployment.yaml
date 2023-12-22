@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment 
+metadata:
+  name: gogs-web
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gogs-web
+  template:
+    metadata:
+      labels:
+        app: gogs-web
+    spec:
+      containers:
+        - name: gogs
+          image: gogs/gogs:0.13
+          ports:
+          - containerPort: 22
+            name: ssh
+          - containerPort: 3000
+            name: http
+          env:
+          - name: SOCAT_LINK
+            value: "false"
+          volumeMounts:
+          - name: gogs
+            mountPath: /data
+      volumes:
+        - name: gogs
+          persistentVolumeClaim:
+            claimName: gogs-claim

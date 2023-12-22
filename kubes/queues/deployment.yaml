@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: queue
+  labels:
+    app: queue
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: queue
+  template:
+    metadata:
+      labels:
+        app: queue
+    spec:
+      containers:
+      - name: queue
+        image: 081952199324.dkr.ecr.us-east-1.amazonaws.com/atelier/queue:latest
+        ports:
+          - containerPort: 5672
+          - containerPort: 15672

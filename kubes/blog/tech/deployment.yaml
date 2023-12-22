@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: blog-tech-web
+  labels:
+    app: blog-tech-web
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: blog-tech-web
+  template:
+    metadata:
+      labels:
+        app: blog-tech-web
+    spec:
+      containers:
+        - name: web
+          image: 081952199324.dkr.ecr.us-east-1.amazonaws.com/blog/tech:latest
+          ports:
+            - name: web
+              containerPort: 80
+      imagePullSecrets:
+        - name: awsecr-cred
