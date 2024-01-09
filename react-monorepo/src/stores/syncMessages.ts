@@ -11,8 +11,6 @@ export default function syncMessages(store: State) {
           return;
         }
 
-        console.log("set message", m.new_val);
-
         store.setMessage(m.new_val);
 
         return;

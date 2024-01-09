@@ -63,7 +63,7 @@ function Messages() {
     <div>
       <li>
         {Object.values(messages).map((message) => (
-          <div key={message.id} className="row">
+          <div key={message.id}>
             <Message key={message.id} message={message} />
             <button
               onClick={() => {

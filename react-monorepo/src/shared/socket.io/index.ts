@@ -1,11 +1,13 @@
 import { err, ok, Result } from "neverthrow";
 import { io, Socket } from "socket.io-client";
+
 import { Events } from "./events";
+import env from "@atelier/shared/env";
 
 let socket: Socket;
 
 export function init(input: { jwt: string }): Promise<Result<void, Error>> {
-  socket = io(import.meta.env.REACT_APP_HELOU_HOST_SOCKET_URL, {
+  socket = io(env.get("REACT_APP_ATELIER_HOST_SOCKET_URL"), {
     extraHeaders: {
       Authorization: `Bearer ${input.jwt}`,
     },
@@ -29,7 +31,7 @@ function on<T = any>(
   callback: (data: { new_val?: T; old_val?: T }) => void
 ): void {
   if (!socket) {
-    socket = io(import.meta.env.REACT_APP_ATELIER_CHAT_SOCKET_URL);
+    socket = io(env.get("REACT_APP_ATELIER_HOST_SOCKET_URL"));
   }
 
   socket.on(event, callback);
@@ -37,7 +39,7 @@ function on<T = any>(
 
 function get(): Socket {
   if (!socket) {
-    socket = io(import.meta.env.REACT_APP_ATELIER_CHAT_SOCKET_URL);
+    socket = io(env.get("REACT_APP_ATELIER_HOST_SOCKET_URL"));
   }
 
   return socket;

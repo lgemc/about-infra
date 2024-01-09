@@ -28,6 +28,8 @@ export default function useChat() {
       }
 
       for (const message of result.value.items) {
+        console.log(message);
+
         $store.addMessage(message);
       }
     };
@@ -36,6 +38,7 @@ export default function useChat() {
   }, []);
 
   const sendMessage = async (payload: { content: string; from?: string }) => {
+    console.log("yes, sending messages to api");
     const result = await messagesAPI.create(Background(), {
       content: payload.content,
       from: payload.from,

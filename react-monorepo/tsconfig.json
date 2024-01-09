@@ -1,9 +1,9 @@
 {
     "compilerOptions": {
         "baseUrl": "./",
-        "target": "ESNext",
+        "target": "esnext",
         "lib": ["dom", "dom.iterable", "esnext"],
-        "module": "ESNext",
+        "module": "esnext",
         "allowJs": true,
         "jsx": "react-jsx",
         "strict": true,
@@ -20,7 +20,8 @@
         "isolatedModules": true,
         "moduleResolution": "node",
         "noEmit": true,
+        "resolveJsonModule": true,
         "types": ["vite/client", "react", "react-dom"]
     },
-    "include": ["src"]
+    "include": ["src", "cmd"]
 }
